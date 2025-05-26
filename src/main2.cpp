@@ -35,7 +35,7 @@ struct searchResult
     virtual ~dictionary() {}
 
     virtual bool isEmpty() const = 0;
-    virtual pair<K,E> find(const K&) const = 0; // find item by key
+    virtual pair<K,E>* find(const K&) const = 0; // find item by key
     virtual void insert(const K&, const E&) = 0; 
     virtual void remove(const K&) = 0;
 
@@ -66,15 +66,16 @@ public:
     }
 
     // search function
-    pair<K,E >find(const K& k) const { return find(this->root, k); }
-    pair<K,E> find(Node* p, const K& k) const // find node p with key k
+    pair<K,E >*find(const K& k) const { return find(this->root, k); }
+    pair<K,E>*find(Node* p, const K& k) const // find node p with key k
     {
-        if (!p) { //can't search anymore
-            return make_pair(K(), E()); // return empty pair if not found
-        }
-        if (k < p->data.first) return find(p->left, k);
-        if (k > p->data.first) return find(p->right, k);
-        return p->data; // found pair, return data
+        if (!p)  //can't search anymore 
+            return nullptr;
+            if (k < p->data.first)
+                return find(p->left, k);
+            if (k > p->data.first)
+                return find(p->right, k);
+            return &(p->data);
     }
 
     // insert function
@@ -108,9 +109,61 @@ public:
     }
 
     //remove function
-    void remove(const K& k) {
-     
-
+    void remove(const K& k) 
+    {
+        node<K, E>* parent = nullptr;
+        node<K, E>* current = this->root;
+        // find the node to remove and its parent
+        while (current && current->data.first != k) {
+            parent = current;
+            if (k < current->data.first) {
+                current = current->left;
+            } else {
+                current = current->right;
+            }
+        }
+        if (!current) throw runtime_error("Key not found"); // if not found, throw error
+        // Case 1: Node to be deleted has no children (leaf node)
+        if (!current->left && !current->right) {
+            if (current == this->root) {
+                this->root = nullptr; // if root is the only node
+            } else if (parent->left == current) {
+                parent->left = nullptr; // unlink from parent
+            } else {
+                parent->right = nullptr;
+            }
+        }
+        // Case 2: Node to be deleted has one child
+        else if (!current->left || !current->right) {
+            node<K, E>* child = current->left ? current->left : current->right; // get the child
+            if (current == this->root) {
+                this->root = child; // if root, set child as new root
+            } else if (parent->left == current) {
+                parent->left = child; // link child to parent
+            } else {
+                parent->right = child;
+            }
+        }
+        // Case 3: Node to be deleted has two children
+        else {
+            // Find the in-order successor (smallest in the right subtree)
+            node<K, E>* succPP = current; //parent of successor
+            node<K, E>* successor = current->right;
+            while (successor->left) {
+                succPP = successor;
+                successor = successor->left;
+            }
+            // Copy the successor's data to the current node
+            current->data = successor->data;
+            // Remove the successor
+            if (succPP->left == successor) {
+                succPP->left = successor->right; // unlink successor
+            } else {
+                succPP->right = successor->right;
+            }
+        }
+        delete current; // free memory
+        numNodes--; // decrease size of tree
     }
     //print all nodes
     string printall() //with DFS
@@ -169,10 +222,10 @@ int main()
         {
             int k = rand() % 100; // random key to search
             fout << "Searching for key: " << k << endl;
-            try {
-                auto item = bst.find(k);
-                fout << "Found item: " << item.first << " : " << item.second << endl;
-            } catch (const std::runtime_error& e) {
+            auto item = bst.find(k);
+            if (item != nullptr) {
+                fout << "Found item: " << item->first << " : " << item->second << endl;
+            } else {
                 fout << "Key not found: " << k << endl;
             }
         }
