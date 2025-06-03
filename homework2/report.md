@@ -112,8 +112,15 @@ protected:
 };
 ```
 
-* 此為抽象基類，定義四個純虛擬函式作為最小堆介面。
-* `heap` 為底層儲存容器，使用 vector 儲存元素。
+- **說明**：
+  - `MinPQ` 是一個模板化的抽象類別，定義了最小優先佇列（Min Priority Queue）的基本介面。
+  - 包含四個純虛擬函式：
+    - `isEmpty()`：檢查佇列是否為空。
+    - `top()`：返回最小元素。
+    - `push()`：插入新元素。
+    - `pop()`：移除最小元素。
+  - 子類別必須實作這些方法。
+  - `heap` 是一個受保護的 `vector<T>`，用於儲存堆的元素。
 
 #### 2. 元素節點類別 node
 
@@ -126,7 +133,11 @@ public:
 };
 ```
 
-* 每個節點只包含一個整數鍵值 `key`。
+- **說明**：
+  - `node` 類別定義堆中的每個元素，僅包含一個整數成員 `key`，表示元素的鍵值。
+  - 提供兩個建構子：
+    - 預設建構子：將 `key` 初始化為 0。
+    - 帶參數建構子：根據輸入參數 `k` 初始化 `key`。
 
 #### 3. MinHeap 類別
 
@@ -181,39 +192,51 @@ private:
 };
 ```
 
-* 插入後執行 `percolateUp`，維持堆的順序。
-* 刪除最小值時執行 `percolateDown`，將最後一個元素移至根並調整位置。
+- **說明**：
+  - `MinHeap` 是 `MinPQ<node>` 的具體實作類別，實現了最小堆的功能。
+  - **公有方法**：
+    - `isEmpty()`：檢查堆是否為空，返回 `heap.empty()` 的結果。
+    - `top()`：返回堆頂（最小元素），若堆為空則拋出異常。
+    - `push(const node& item)`：將新元素加入堆尾，並呼叫 `percolateUp` 向上調整。
+    - `pop()`：移除堆頂元素，將堆尾元素移至堆頂，並呼叫 `percolateDown` 向下調整。
+  - **私有方法**：
+    - `percolateUp(int index)`：從指定索引向上調整，確保父節點鍵值小於子節點。
+    - `percolateDown(int index)`：從指定索引向下調整，選擇最小子節點交換，維持堆性質。
 
 ---
 
 ### 二、BST 實作與高度實驗
 
-#### 1. 節點定義與建構子
+#### 1. 節點類別 Node
 
 ```cpp
 class Node {
 public:
-    int key, value;
+    int key;
+    int value;
     Node* left;
     Node* right;
+
     Node(int k, int v) : key(k), value(v), left(nullptr), right(nullptr) {}
 };
 ```
 
-#### 2. BST 類別定義
+- **說明**：
+  - `Node` 類別表示二元搜尋樹（BST）中的節點。
+  - 成員包括：
+    - `key`：整數鍵值，用於比較和排序。
+    - `value`：整數值，儲存節點的數據。
+    - `left` 和 `right`：指向左子節點和右子節點的指標。
+  - 建構子將 `key` 和 `value` 初始化，並將 `left` 和 `right` 設為 `nullptr`。
+
+#### 2. BST 類別
 
 ```cpp
 class BST {
 private:
     Node* root;
     int numNodes;
-```
 
-* `root` 指向根節點，`numNodes` 紀錄節點數。
-
-#### 3. 插入、刪除與工具函式
-
-```cpp
     Node* insert(Node* node, int key, int value, bool& inserted);
     Node* deleteNode(Node* node, int key);
     Node* minNode(Node* node);
@@ -230,10 +253,70 @@ public:
 };
 ```
 
-* `insert()` 支援重複檢查與節點遞迴插入。
-* `deleteNode()` 依據是否有子節點處理刪除邏輯。
-* `height()` 為遞迴計算深度之函式。
-* `clear()` 釋放記憶體。
+- **說明**：
+  - `BST` 類別實現了二元搜尋樹的基本操作。
+  - **私有成員**：
+    - `root`：樹的根節點指標。
+    - `numNodes`：樹中的節點數量。
+  - **私有方法**：
+    - `insert`：遞迴插入節點，若鍵值重複則不插入，透過 `inserted` 返回結果。
+    - `deleteNode`：遞迴刪除指定鍵的節點，處理三種情況（無子節點、單子節點、雙子節點）。
+    - `minNode`：返回以 `node` 為根的最小節點（最左子節點）。
+    - `height`：遞迴計算樹高。
+    - `clear`：遞迴釋放樹中所有節點的記憶體。
+  - **公有方法**：
+    - `BST()`：建構子，初始化 `root` 為 `nullptr`，`numNodes` 為 0。
+    - `~BST()`：解構子，呼叫 `clear` 清理樹。
+    - `insert(int key, int value)`：插入新節點，返回是否成功。
+    - `remove(int key)`：刪除指定鍵的節點。
+    - `getHeight()`：返回樹的高度。
+    - `size()`：返回節點數量。
+
+#### 3. 實驗運行函式
+
+```cpp
+void runExperiment(const vector<int>& ns, const string& filename) {
+    ofstream fout(filename);
+    if (!fout) {
+        cerr << "Failed to open output file." << endl;
+        return;
+    }
+
+    srand(time(0));
+    for (int n : ns) {
+        BST bst;
+        unordered_set<int> used;
+        while (bst.size() < n) {
+            int key = rand() % (n * 10);
+            int value = rand() % 1000;
+            if (used.insert(key).second) {
+                bst.insert(key, value);
+            }
+        }
+        int h = bst.getHeight();
+        double log2n = log2(n);
+        double ratio = h / log2n;
+
+        fout << "n = " << n
+             << ", height = " << h
+             << ", log2(n) = " << log2n
+             << ", height/log2(n) = " << ratio << endl;
+    }
+    fout.close();
+}
+```
+
+- **說明**：
+  - `runExperiment` 函式用於測試 BST 的高度與節點數量的關係。
+  - **參數**：
+    - `ns`：包含不同節點數量的向量。
+    - `filename`：輸出結果的文件名稱。
+  - **流程**：
+    - 開啟輸出文件，若失敗則輸出錯誤訊息。
+    - 對每個 `n`，創建一個 BST，使用 `unordered_set` 確保鍵值不重複。
+    - 隨機生成鍵值和數據，插入 BST，直到節點數達到 `n`。
+    - 計算樹高 `h`、$\log_2(n)$ 和比值 `h / log2n`，並將結果寫入文件。
+    
 
 ---
 
