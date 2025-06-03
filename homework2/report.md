@@ -324,31 +324,6 @@ void runExperiment(const vector<int>& ns, ofstream& fout) {
              << ", insertion time = " << duration << " us\n";
     }
 
-    // ChartJS 折線圖
-    fout << "```chartjs\n";
-    fout << "{\n";
-    fout << "    \"type\": \"line\",\n";
-    fout << "    \"data\": {\n";
-    fout << "        \"labels\": [100, 500, 1000, 2000, 3000, 10000],\n";
-    fout << "        \"datasets\": [{\n";
-    fout << "            \"label\": \"Height / log2(n)\",\n";
-    fout << "            \"data\": [" << ratios[0] << ", " << ratios[1] << ", " << ratios[2] << ", "
-             << ratios[3] << ", " << ratios[4] << ", " << ratios[5] << "],\n";
-    fout << "            \"borderColor\": \"#36A2EB\",\n";
-    fout << "            \"backgroundColor\": \"#36A2EB\",\n";
-    fout << "            \"fill\": false\n";
-    fout << "        }]\n";
-    fout << "    },\n";
-    fout << "    \"options\": {\n";
-    fout << "        \"scales\": {\n";
-    fout << "            \"x\": {\"title\": {\"display\": true, \"text\": \"n (Number of Insertions)\"}},\n";
-    fout << "            \"y\": {\"title\": {\"display\": true, \"text\": \"Height / log2(n)\"}, \"suggestedMin\": 0, \"suggestedMax\": 3}\n";
-    fout << "        },\n";
-    fout << "        \"plugins\": {\"title\": {\"display\": true, \"text\": \"BST Height Ratio vs n\"}}\n";
-    fout << "    }\n";
-    fout << "}\n";
-    fout << "```\n";
-}
 ```
 
 #### 說明：
