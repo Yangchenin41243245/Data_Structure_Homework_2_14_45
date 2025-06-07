@@ -348,8 +348,6 @@ void runExperiment(const vector<int>& ns, const string& filename) {
 
 *Note*: 比率在 1.65 到 2.41 之間波動，平均約 2，符合隨機 BST 的理論預期（高度約 2 * log2(n)）。
 
-![image](https://github.com/example/BST_Height_Experiment/blob/main/height_ratio.png)
-
 ### 時間複雜度驗證
 - **MinHeap**：
   - `insert` 和 `delMin` 平均時間隨 n 增加呈對數增長，符合 O(log n)。
@@ -375,6 +373,47 @@ void runExperiment(const vector<int>& ns, const string& filename) {
   - 刪除函數實現正確，平均 O(log n)，但未在主程式測試。
   - 未來可引入平衡樹（如 AVL 或紅黑樹）改善最壞情況效能。
 
+---
+
+## 第三題解答：
+
+### (a)
+
+外部排序第二階段使用 k 路合併的輸入總時間為：
+
+$$
+\boxed{
+t_{\text{input}}(k) = \left( \frac{n \cdot k}{S} \right) \cdot (ts + t) + n \cdot t
+}
+$$
+
+---
+
+### (b)
+
+代入具體數值後，
+
+$$
+\boxed{
+t_{\text{input}}(k) = 0.1k + 200 \quad (\text{單位：秒})
+}
+$$
+
+這是一條線性上升的函數，總會存在某個 `k` 值使得：
+
+$$
+t_{\text{input}}(k) \approx t_{\text{CPU}}
+$$
+
+| k  | t\_input(k) (秒) |
+| -- | --------------- |
+| 1  | 200.1           |
+| 2  | 200.2           |
+| 4  | 200.4           |
+| 8  | 200.8           |
+| 16 | 201.6           |
+| 32 | 203.2           |
+| 64 | 206.4           |
 
 ### 結論
 
