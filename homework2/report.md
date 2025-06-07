@@ -387,7 +387,6 @@ t_{\text{input}}(k) = \left( \frac{n \cdot k}{S} \right) \cdot (ts + t) + n \cdo
 }
 $$
 
----
 
 ### (b)
 
